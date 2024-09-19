@@ -5,247 +5,247 @@ import string
 from cryptography.fernet import Fernet
 import os
 
-def generar_clave():
-    clave = Fernet.generate_key()
-    with open("clave.key", "wb") as clave_file:
-        clave_file.write(clave)
+def generate_key():
+    key = Fernet.generate_key()
+    with open("key.key", "wb") as key_file:
+        key_file.write(key)
 
-if not os.path.exists('clave.key'):
-    generar_clave()
-    print("El archivo 'clave.key' no existe.")
+if not os.path.exists('key.key'):
+    generate_key()
+    print("The file 'key.key' does not exist.")
 
-contraseñasNombre = []
-contraseñas = []
+password_names = []
+passwords = []
 
 lower = string.ascii_lowercase
 upper = string.ascii_uppercase
-num = string.digits
+digits = string.digits
 symbols = string.punctuation
-chars_complete = lower + upper + num + symbols
-chars_no_symbols = lower + upper + num
+chars_complete = lower + upper + digits + symbols
+chars_no_symbols = lower + upper + digits
 
-# Proceso de encriptación
-def cargar_clave():
-    return open("clave.key", "rb").read()
+# Encryption process
+def load_key():
+    return open("key.key", "rb").read()
 
-def encriptar(nom_archivo, clave):
-    f = Fernet(clave)
-    with open(nom_archivo, "rb") as file:
-        archivo_info = file.read()
-    encriptado = f.encrypt(archivo_info)
-    with open(nom_archivo, "wb") as file:
-        file.write(encriptado)
+def encrypt_file(filename, key):
+    f = Fernet(key)
+    with open(filename, "rb") as file:
+        file_data = file.read()
+    encrypted = f.encrypt(file_data)
+    with open(filename, "wb") as file:
+        file.write(encrypted)
 
-def desencriptar(nom_archivo, clave):
-    f = Fernet(clave)
-    with open(nom_archivo, "rb") as file:
-        encriptado = file.read()
-    desencriptado = f.decrypt(encriptado)
-    with open(nom_archivo, "wb") as file:
-        file.write(desencriptado)
+def decrypt_file(filename, key):
+    f = Fernet(key)
+    with open(filename, "rb") as file:
+        encrypted = file.read()
+    decrypted = f.decrypt(encrypted)
+    with open(filename, "wb") as file:
+        file.write(decrypted)
 
-# Cargar la clave de encriptación
-clave = cargar_clave()
-nom_archivo = "contraseñas.txt"
+# Load the encryption key
+key = load_key()
+filename = "passwords.txt"
 
-def vista_contraseña(ventana_verContraseñas):
-    if not contraseñasNombre:
-        mensaje_label = tk.Label(ventana_verContraseñas, text="No tienes contraseñas guardadas.")
-        mensaje_label.pack()
+def view_passwords_window(view_window):
+    if not password_names:
+        message_label = tk.Label(view_window, text="You have no saved passwords.")
+        message_label.pack()
         return
     
-    for i in range(len(contraseñasNombre)):
-        contra = contraseñas[i]
-        contraseñasTemp = contraseñasNombre[i] + ": " + contraseñas[i]
-        mensaje_label = tk.Label(ventana_verContraseñas, text=contraseñasTemp)
-        mensaje_label.pack()
+    for i in range(len(password_names)):
+        pwd = passwords[i]
+        temp_password = password_names[i] + ": " + passwords[i]
+        message_label = tk.Label(view_window, text=temp_password)
+        message_label.pack()
         
-        def copiar_al_portapapeles(contra=contra):
-            ventana_verContraseñas.clipboard_clear()
-            ventana_verContraseñas.clipboard_append(contra)
+        def copy_to_clipboard(pwd=pwd):
+            view_window.clipboard_clear()
+            view_window.clipboard_append(pwd)
 
-        copiar = Button(ventana_verContraseñas, text="Copiar Contraseña", command=copiar_al_portapapeles)
-        copiar.pack()
+        copy_button = Button(view_window, text="Copy Password", command=copy_to_clipboard)
+        copy_button.pack()
         
-        eliminar = Button(ventana_verContraseñas, text="Eliminar Contraseña", command=lambda i=i: eliminar_contraseña(ventana_verContraseñas, i))
-        eliminar.pack()
+        delete_button = Button(view_window, text="Delete Password", command=lambda i=i: delete_password(view_window, i))
+        delete_button.pack()
 
-def eliminar_contraseña(ventana_verContraseñas, indice):
-    # Elimina la contraseña de las listas en memoria
-    del contraseñasNombre[indice]
-    del contraseñas[indice]
+def delete_password(view_window, index):
+    # Remove the password from the in-memory lists
+    del password_names[index]
+    del passwords[index]
     
-    # Reescribe el archivo de texto sin la contraseña eliminada
-    guardar_contraseñas_en_archivo()
+    # Rewrite the text file without the deleted password
+    save_passwords_to_file()
     
-    # Cierra la ventana de ver contraseñas y vuelve a abrirla para actualizar la vista
-    ventana_verContraseñas.destroy()
-    abrir_ventana_verContraseñas()
+    # Close the view passwords window and reopen it to update the view
+    view_window.destroy()
+    open_view_passwords_window()
 
-def añadir_contraseña(ventana_añadirContraseñas):
-    global contraseña_Nombre_entry, contraseña_entry
+def add_password_window(add_window):
+    global password_name_entry, password_entry
     
-    contraseña_Nombre_label = tk.Label(ventana_añadirContraseñas, text="Ingresa el correo/usuario:")
-    contraseña_Nombre_label.pack()
-    contraseña_Nombre_entry = tk.Entry(ventana_añadirContraseñas)
-    contraseña_Nombre_entry.pack()
+    password_name_label = tk.Label(add_window, text="Enter email/username:")
+    password_name_label.pack()
+    password_name_entry = tk.Entry(add_window)
+    password_name_entry.pack()
 
-    contraseña_label = tk.Label(ventana_añadirContraseñas, text="Ingresa una contraseña:")
-    contraseña_label.pack()
-    contraseña_entry = tk.Entry(ventana_añadirContraseñas)
-    contraseña_entry.pack()
+    password_label = tk.Label(add_window, text="Enter a password:")
+    password_label.pack()
+    password_entry = tk.Entry(add_window)
+    password_entry.pack()
 
-    # Botón para guardar la contraseña
-    boton_guardar = tk.Button(
-        ventana_añadirContraseñas,
-        text="Guardar Contraseña",
-        command=lambda: guardar_Contraseñas(ventana_añadirContraseñas)
+    # Button to save the password
+    save_button = tk.Button(
+        add_window,
+        text="Save Password",
+        command=lambda: save_password(add_window)
     )
-    boton_guardar.pack()
+    save_button.pack()
 
-def guardar_Contraseñas(ventana_añadirContraseñas):
-    nombre = contraseña_Nombre_entry.get()
-    contraseña = contraseña_entry.get()
-    if nombre and contraseña:
-        contraseñasNombre.append(nombre)
-        contraseñas.append(contraseña)
-        guardar_contraseñas_en_archivo()  # Guarda las contraseñas en el archivo
-        ventana_añadirContraseñas.destroy()
+def save_password(add_window):
+    name = password_name_entry.get()
+    password = password_entry.get()
+    if name and password:
+        password_names.append(name)
+        passwords.append(password)
+        save_passwords_to_file()  # Save the passwords to the file
+        add_window.destroy()
     else:
-        error_label = tk.Label(ventana_añadirContraseñas, text="Por favor, completa ambos campos.", fg="red")
+        error_label = tk.Label(add_window, text="Please complete both fields.", fg="red")
         error_label.pack()
 
-def guardar_contraseñas_en_archivo():
-    with open(nom_archivo, "w") as file:
-        for nombre, contraseña in zip(contraseñasNombre, contraseñas):
-            file.write(f"{nombre}:{contraseña}\n")
-    encriptar(nom_archivo, clave)
+def save_passwords_to_file():
+    with open(filename, "w") as file:
+        for name, password in zip(password_names, passwords):
+            file.write(f"{name}:{password}\n")
+    encrypt_file(filename, key)
 
-def leer_contraseñas_desde_archivo():
+def read_passwords_from_file():
     try:
-        desencriptar(nom_archivo, clave)
-        with open(nom_archivo, "r") as file:
+        decrypt_file(filename, key)
+        with open(filename, "r") as file:
             for line in file:
-                nombre, contraseña = line.strip().split(":")
-                contraseñasNombre.append(nombre)
-                contraseñas.append(contraseña)
-        encriptar(nom_archivo, clave)
+                name, password = line.strip().split(":")
+                password_names.append(name)
+                passwords.append(password)
+        encrypt_file(filename, key)
     except FileNotFoundError:
-        # Si el archivo no existe, simplemente continúa
+        # If the file does not exist, simply continue
         pass
 
-def datos_generar_contraseña(ventana_generarContraseñas):
-    global contraseña_longitud_entry, var, longitud, contraseña
-    contraseña_longitud = tk.Label(ventana_generarContraseñas, text="Ingresa la longitud (máximo 20 dígitos):")
-    contraseña_longitud.pack()
-    contraseña_longitud_entry = tk.Entry(ventana_generarContraseñas)
-    contraseña_longitud_entry.pack()
+def generate_password_data(generate_window):
+    global password_length_entry, var, length, password
+    password_length_label = tk.Label(generate_window, text="Enter length (maximum 20 characters):")
+    password_length_label.pack()
+    password_length_entry = tk.Entry(generate_window)
+    password_length_entry.pack()
 
     var = tk.IntVar()
-    checkbox = tk.Checkbutton(ventana_generarContraseñas, text="Deseo que mi contraseña tenga caracteres especiales", variable=var)
+    checkbox = tk.Checkbutton(generate_window, text="I want my password to have special characters", variable=var)
     checkbox.pack()
 
-    boton_guardar_datos = tk.Button(
-        ventana_generarContraseñas,
-        text="Generar Contraseña",
-        command=lambda: generar_Contraseñas(ventana_generarContraseñas)
+    generate_button = tk.Button(
+        generate_window,
+        text="Generate Password",
+        command=lambda: generate_password(generate_window)
     )
-    boton_guardar_datos.pack()
+    generate_button.pack()
 
-def generar_Contraseñas(ventana_generarContraseñas):
+def generate_password(generate_window):
     global error_label
 
     if 'error_label' in globals():
         error_label.destroy()
 
     try:
-        longitud = int(contraseña_longitud_entry.get())
-        if longitud <= 0 or longitud > 20:
-            raise ValueError("Longitud fuera de rango")
+        length = int(password_length_entry.get())
+        if length <= 0 or length > 20:
+            raise ValueError("Length out of range")
     except ValueError:
-        if not contraseña_longitud_entry.get():
-            error_label = tk.Label(ventana_generarContraseñas, text="Por favor, ingresa una longitud.", fg="red")
+        if not password_length_entry.get():
+            error_label = tk.Label(generate_window, text="Please enter a length.", fg="red")
         else:
-            error_label = tk.Label(ventana_generarContraseñas, text="Longitud fuera de rango. Ingrese un número entre 1 y 20.", fg="red")
+            error_label = tk.Label(generate_window, text="Length out of range. Enter a number between 1 and 20.", fg="red")
         error_label.pack()
         return
 
     if var.get() == 1:
-        contraseña = "".join(random.sample(chars_complete, longitud))
+        password = "".join(random.sample(chars_complete, length))
     else:
-        contraseña = "".join(random.sample(chars_no_symbols, longitud))
-    contraseña_mostrar = tk.Label(ventana_generarContraseñas, text=contraseña)
-    contraseña_mostrar.pack()
-    contraseña_mostrar.pack(pady=10)
-    def copiar_al_portapapeles():
-        ventana_generarContraseñas.clipboard_clear()
-        ventana_generarContraseñas.clipboard_append(contraseña)
+        password = "".join(random.sample(chars_no_symbols, length))
+    display_password = tk.Label(generate_window, text=password)
+    display_password.pack(pady=10)
+    
+    def copy_to_clipboard():
+        generate_window.clipboard_clear()
+        generate_window.clipboard_append(password)
 
-    copiar = Button(ventana_generarContraseñas, text="Copiar Contraseña",command=copiar_al_portapapeles)
-    copiar.pack()
+    copy_button = Button(generate_window, text="Copy Password", command=copy_to_clipboard)
+    copy_button.pack()
 
-def abrir_ventana_añadirContraseñas():
-    # Crear una ventana secundaria.
-    ventana_añadirContraseñas = tk.Toplevel()
-    ventana_añadirContraseñas.title("Añadir Contraseñas")
-    ventana_añadirContraseñas.geometry("300x150")  # Establece el tamaño de la ventana
-    añadir_contraseña(ventana_añadirContraseñas)
+def open_add_password_window():
+    # Create a secondary window.
+    add_window = tk.Toplevel()
+    add_window.title("Add Passwords")
+    add_window.geometry("300x150")  # Set the window size
+    add_password_window(add_window)
 
-def abrir_ventana_verContraseñas():
-    # Crear una ventana secundaria.
-    ventana_verContraseñas = tk.Toplevel()
-    ventana_verContraseñas.title("Ver Contraseñas")
-    ventana_verContraseñas.geometry("300x100")  # Establece el tamaño de la ventana
-    vista_contraseña(ventana_verContraseñas)
+def open_view_passwords_window():
+    # Create a secondary window.
+    view_window = tk.Toplevel()
+    view_window.title("View Passwords")
+    view_window.geometry("300x100")  # Set the window size
+    view_passwords_window(view_window)
 
-def abrir_ventana_generarContraseñas():
-    # Crear una ventana secundaria.
-    ventana_generarContraseñas = tk.Toplevel()
-    ventana_generarContraseñas.title("Generar Contraseña")
-    datos_generar_contraseña(ventana_generarContraseñas)
+def open_generate_password_window():
+    # Create a secondary window.
+    generate_window = tk.Toplevel()
+    generate_window.title("Generate Password")
+    generate_password_data(generate_window)
 
-def cerrar_programa():
-    ventana.destroy()
+def close_program():
+    window.destroy()
 
-# Configuración de la ventana principal
-ventana = tk.Tk()
-ventana.title("Password Manager")
-ventana.geometry("300x190")  # Establece el tamaño de la ventana principal
+# Main window configuration
+window = tk.Tk()
+window.title("Password Manager")
+window.geometry("300x190")  # Set the main window size
 
-leer_contraseñas_desde_archivo()  # Lee las contraseñas al inicio
+read_passwords_from_file()  # Read passwords on startup
 
-# Botón para abrir la ventana de añadir contraseñas
-boton_abrir_AñadirContraseñas = tk.Button(
-    ventana,
-    text="Añadir Contraseñas",
-    command=abrir_ventana_añadirContraseñas
+# Button to open the add passwords window
+add_password_button = tk.Button(
+    window,
+    text="Add Passwords",
+    command=open_add_password_window
 )
-boton_abrir_AñadirContraseñas.pack(pady=10)  # Centra el botón verticalmente con un margen
+add_password_button.pack(pady=10)  # Center the button vertically with a margin
 
-# Botón para ver las contraseñas
-boton_abrir_VerContraseñas = tk.Button(
-    ventana,
-    text="Ver mis contraseñas",
-    command=abrir_ventana_verContraseñas
+# Button to view the passwords
+view_passwords_button = tk.Button(
+    window,
+    text="View My Passwords",
+    command=open_view_passwords_window
 )
-boton_abrir_VerContraseñas.pack(pady=10)  # Centra el botón verticalmente con un margen
+view_passwords_button.pack(pady=10)  # Center the button vertically with a margin
 
-# Botón para generar las contraseñas
-boton_abrir_generarContraseñas = tk.Button(
-    ventana,
-    text="Generar contraseña",
-    command=abrir_ventana_generarContraseñas
+# Button to generate passwords
+generate_password_button = tk.Button(
+    window,
+    text="Generate Password",
+    command=open_generate_password_window
 )
-boton_abrir_generarContraseñas.pack(pady=10)  # Centra el botón verticalmente con un margen
+generate_password_button.pack(pady=10)  # Center the button vertically with a margin
 
-boton_cerrar_programa = tk.Button(
-    ventana,
-    text="Cerrar",
-    command=cerrar_programa
+close_button = tk.Button(
+    window,
+    text="Close",
+    command=close_program
 )
-boton_cerrar_programa.pack(pady=10)  # Centra el botón verticalmente con un margen
+close_button.pack(pady=10)  # Center the button vertically with a margin
 
-mensaje_label = tk.Label(ventana, text="")
-mensaje_label.pack()
+message_label = tk.Label(window, text="")
+message_label.pack()
 
-ventana.mainloop()
+window.mainloop()
